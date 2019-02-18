@@ -1,13 +1,11 @@
 import ast
 import inspect
 import types
-from pathlib import Path
 from typing import *
 
 import mcpack
 
-import mc_parser
-import test
+import pydatapack.mc.commands as mc
 
 
 def parse_module_to_datapack(datapack: mcpack.DataPack, namespace_name: str, module):
@@ -21,44 +19,37 @@ def _parse_module(module, namespace_name: str) -> List[Tuple[str, mcpack.Functio
     file = inspect.getfile(module)
     compile(source, file, "exec")
     ast_obj = ast.parse(source, file)
-    Simplifier(module).visit(ast_obj)
-    return MCParser(namespace_name).visit(ast_obj)
+    return Simplifier(module, namespace_name).visit(ast_obj)
 
 
-class CommandNode(ast.AST):
-    def __init__(self, command):
-        self.data = command
+class CommandNode(ast.Str):
+    pass
 
 
-class Simplifier(ast.NodeTransformer):
+class Simplifier(ast.NodeVisitor):
     """
     Simplifies the whole tree so it would be easier to read later.
     """
-    def __init__(self, module):
+    def __init__(self, module, namespace_name):
         self._module = module
+        self._ns_name = namespace_name
 
         self._globals = self._module.__dict__
+        self._locals = {}
 
     def _eval(self, node):
-        return eval(compile(ast.Expression(node), "ast", "eval"), self._globals, {})
+        try:
+            code = compile(ast.Expression(node), inspect.getfile(self._module), "eval")
+        except TypeError:
+            exec(compile(ast.Interactive([node]), inspect.getfile(self._module), "single"), self._globals, self._locals)
+        else:
+            return eval(code, self._globals, self._locals)
 
-    def _exec(self, node):
-        exec(compile(ast.Interactive([node]), "ast", "single"), self._globals, {})
+    def visit_Import(self, node: ast.Import):
+        self._eval(node)
 
-    def visit_Call(self, node):
-        self.generic_visit(node)
-        # Replace function node with function pointer
-        node.func = self._eval(node.func)
-        # If call to function outside module evaluate
-        if inspect.getmodule(node.func) != self._module:
-            return node.func(*(self._eval(arg) for arg in node.args))
-
-        return node
-
-
-class MCParser(ast.NodeVisitor):
-    def __init__(self, namespace_name: str):
-        self._ns_name = namespace_name
+    def visit_ImportFrom(self, node: ast.ImportFrom):
+        self._eval(node)
 
     def generic_visit(self, node):
         """Called if no explicit visitor function exists for a node."""
@@ -67,47 +58,61 @@ class MCParser(ast.NodeVisitor):
                 if isinstance(value, list):
                     for item in value:
                         if isinstance(item, ast.AST):
-                            yield self.visit(item)
+                            ret = self.visit(item)
+                            if ret:
+                                yield ret
                 elif isinstance(value, ast.AST):
-                    yield self.visit(value)
+                    ret = self.visit(value)
+                    if ret:
+                        yield ret
 
-        for ret in helper():
-            if isinstance(ret, types.GeneratorType):
-                yield from ret
-            elif ret:
-                yield ret
+        ret_list = list(helper())
+        if ret_list:
+            if isinstance(ret_list[0], str):
+                return ''.join(ret_list)
+            if isinstance(ret_list[0], tuple):
+                return ret_list
 
     def visit_Module(self, node: ast.Module) -> List[Tuple[str, mcpack.Function]]:
-        return list(self.generic_visit(node))
+        return self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> Tuple[str, mcpack.Function]:
-        """Returns a tuple containing the function name and list of mc commands"""
-        func_str = ""
+        self._locals = {}
 
+        func_str = ""
         docstring = ast.get_docstring(node)
         if docstring:
-            func_str += '\n'.join(f'# {line}' for line in docstring.split('\n')) + '\n\n'
+            func_str = '\n'.join(f'# {line}' for line in docstring.split('\n')) + '\n\n'
 
         commands = self.generic_visit(node)
         if commands:
-            func_str += ('\n'.join(commands))
+            func_str += commands
 
-        return node.name, mcpack.Function(func_str)
+        return node.name, mcpack.Function(func_str.strip() + '\n')
 
-    def visit_CommandNode(self, node: CommandNode):
-        return node.data
+    def visit_Call(self, node: ast.Call):
+        func = self._eval(node.func)
+        if inspect.getmodule(func) == self._module:
+            # Replace function node with function pointer
+            return f"function {self._ns_name}:{func.__name__}\n"
 
-    def visit_Call(self, node):
-        return f"function {self._ns_name}:{node.func.__name__}"
+        self._eval(node)
+        if mc._commands:
+            return mc._commands.pop()
 
+    def visit_Assign(self, node: ast.Assign):
+        self._eval(node)
+        if mc._commands:
+            return mc._commands.pop()
 
-if __name__ == "__main__":
-    pack = mcpack.DataPack("Pack", "Description")
-    parse_module_to_datapack(pack, "pack", test)
+    def visit_With(self, node: ast.With):
+        self._eval(node)
+        if mc._commands:
+            return mc._commands.pop()
 
-    pack.dump(
-        Path.home() / r"AppData\Roaming\.minecraft\saves\Superflat Testing\datapacks",
-        overwrite=True)
-
+    def visit_Delete(self, node: ast.Delete):
+        self._eval(node)
+        if mc._commands:
+            return mc._commands.pop()
 
 

@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 mcpack = "*"
+typeguard = "*"
 
 [dev-packages]
 
