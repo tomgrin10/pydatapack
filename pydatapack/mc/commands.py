@@ -1,15 +1,16 @@
-import enum as _enum
-import typing as _t
+import enum
+from typing import *
 
-from contextlib import contextmanager
 import json as _json
 from typeguard import check_argument_types
 
-import pydatapack.utils as _utils
+import pydatapack.utils as utils
 from .misc import _target
 
+__all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
 
-_commands: _t.List[str] = []
+
+_commands: List[str] = []
 
 
 class CommandError(Exception):
@@ -21,8 +22,8 @@ def _to_json(arg) -> str:
 
 
 def _default_parser(arg) -> str:
-    if isinstance(arg, _enum.Enum):
-        return _utils.pascal_to_snake_case(arg.name).strip('_').replace('_', '-')
+    if isinstance(arg, enum.Enum):
+        return utils.pascal_to_snake_case(arg.name).strip('_').replace('_', '-')
     if isinstance(arg, bool):
         return str(arg).lower()
 
@@ -30,9 +31,9 @@ def _default_parser(arg) -> str:
 
 
 def _generic_command(name: str = None,
-                     generic: _t.Callable[[_t.Any], str] = _default_parser,
-                     arg_parsers: _t.Dict[str, _t.Callable[[_t.Any], str]] = None,
-                     ignore: _t.List[str] = None):
+                     generic: Callable[[Any], str] = _default_parser,
+                     arg_parsers: Dict[str, Callable[[Any], str]] = None,
+                     ignore: List[str] = None):
     """
     Decorator that creates command out of function definition.
     :param generic: Generic parser to use for parsing arguments instead of default parser
@@ -56,9 +57,9 @@ def _generic_command(name: str = None,
 
             command = ""
 
-            class_ = _utils.get_defining_class(func)
+            class_ = utils.get_defining_class(func)
             if class_:
-                command += _utils.pascal_to_snake_case(class_.__name__).strip('_').replace('_', '-') + ' '
+                command += utils.pascal_to_snake_case(class_.__name__).strip('_').replace('_', '-') + ' '
 
             # Set command name
             final_name = func.__name__.strip('_').replace('_', '-')
@@ -67,7 +68,7 @@ def _generic_command(name: str = None,
             if final_name:
                 command += final_name + ' '
 
-            default_arg_parser = _utils.get_arg_default(_generic_command, "generic")
+            default_arg_parser = utils.get_arg_default(_generic_command, "generic")
             final_kwargs = {}
             for key, value in unparsed_kwargs.items():
                 # Ignore argument
@@ -80,7 +81,7 @@ def _generic_command(name: str = None,
             # Set arguments
             command += ' '.join(final_kwargs.values())
 
-            _commands.append(command.strip() + '\n')
+            _commands.append(command.strip())
             return func(*args, **kwargs)
 
         return wrapper
@@ -88,39 +89,30 @@ def _generic_command(name: str = None,
 
 
 class advancement:
-    class method(_enum.Enum):
-        only = _enum.auto()
-        until = _enum.auto()
-        from_ = _enum.auto()
-        through = _enum.auto()
-        everything = _enum.auto()
+    class method(enum.Enum):
+        only = enum.auto()
+        until = enum.auto()
+        from_ = enum.auto()
+        through = enum.auto()
+        everything = enum.auto()
 
     @staticmethod
     @_generic_command()
-    def grant(target: _t.Union[_target, str], method: method, advancement: _t.Optional[str] = None, criterion: _t.Optional[str] = None):
+    def grant(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert check_argument_types()
 
     @staticmethod
     @_generic_command()
-    def revoke(target: _t.Union[_target, str], method: method, advancement: _t.Optional[str] = None, criterion: _t.Optional[str] = None):
+    def revoke(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert check_argument_types()
 
 
 class Bossbar:
-    def __init__(self, id: str, name: str = None):
+    def __init__(self, id: str):
         """
         :param name: If this is supplied the 'bossbar add' command is called.
         """
         self.id: str = id
-        if name is not None:
-            self._name = name
-            self._color = "white"
-            self._style = "progress"
-            self._value = 0
-            self._max = 100
-            self._visible = True
-            self._players = None
-            self._add(name)
 
     @staticmethod
     @_generic_command()
@@ -128,11 +120,18 @@ class Bossbar:
         pass
 
     @_generic_command(ignore=["self"], name="{__name__} {self.id}", arg_parsers={"name": _to_json})
-    def _add(self, name: str):
+    def add(self, name: str):
         assert check_argument_types()
+        self._name = name
+        self._color = "white"
+        self._style = "progress"
+        self._value = 0
+        self._max = 100
+        self._visible = True
+        self._players = None
 
     @_generic_command(ignore=["self"], name="{__name__} {self.id}")
-    def _set(self, setting: str, value: _t.Any):
+    def _set(self, setting: str, value: Any):
         assert check_argument_types()
         setattr(self, f"_{setting}", value)
 
@@ -145,7 +144,7 @@ class Bossbar:
             _commands.append(f"bossbar get {self.id} {setting}")
 
     @_generic_command(ignore=["self"], name="remove {self.id}")
-    def __del__(self):
+    def remove(self):
         pass
 
     @property
@@ -216,34 +215,27 @@ class Bossbar:
 
 class execute:
     @staticmethod
-    @contextmanager
     @_generic_command()
-    def at(target: _t.Union[_target, str]):
-        global _commands
-        prev_commands = _commands
-        _commands = []
-        yield
-        execute_str = prev_commands.pop().strip()
-        prev_commands.append(''.join(f'{execute_str} run {command}' for command in _commands))
-        _commands = prev_commands
+    def at(target: Union[_target, str]):
+        pass
 
 
-class _gamemode(_enum.Enum):
-    survival = _enum.auto()
-    creative = _enum.auto()
-    adventure = _enum.auto()
-    spectator = _enum.auto()
-    _value = _enum.auto()
+class _gamemode(enum.Enum):
+    survival = enum.auto()
+    creative = enum.auto()
+    adventure = enum.auto()
+    spectator = enum.auto()
+    _value = enum.auto()
 
     @_generic_command(ignore=['self'], name='')
-    def __call__(self, mode: '_gamemode', target: _t.Union[_target, str] = None):
+    def __call__(self, mode: '_gamemode', target: Union[_target, str] = None):
         assert check_argument_types()
 
 gamemode = _gamemode._value
 
 
 @_generic_command()
-def msg(target: _t.Union[_target, str], msg: str):
+def msg(target: Union[_target, str], msg: str):
     assert check_argument_types()
 whisper = msg
 tell = msg

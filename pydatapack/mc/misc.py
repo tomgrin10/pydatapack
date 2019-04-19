@@ -1,9 +1,10 @@
 import enum
 import typing
 
+from typeguard import check_argument_types
+
 from pydatapack import utils
 import pydatapack.mc.commands as commands
-from typeguard import check_argument_types
 
 __all__ = ["target"]
 
@@ -29,7 +30,7 @@ class _target_entities(_target):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sorting' = None,
+                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
                  level: int = None, gamemode: 'commands._gamemode' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
@@ -41,7 +42,7 @@ class _target_players(_target):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sorting' = None,
+                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
                  level: int = None, gamemode: 'commands._gamemode' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
@@ -60,7 +61,7 @@ class _target_one(_target):
 
 
 class target:
-    class sorting(enum.Enum):
+    class sort(enum.Enum):
         arbitrary = enum.auto()
         nearest = enum.auto()
         furthest = enum.auto()

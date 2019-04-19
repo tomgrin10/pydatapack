@@ -19,17 +19,10 @@ def _parse_module(module, namespace_name: str) -> List[Tuple[str, mcpack.Functio
     file = inspect.getfile(module)
     compile(source, file, "exec")
     ast_obj = ast.parse(source, file)
-    return Simplifier(module, namespace_name).visit(ast_obj)
+    return MCParser(module, namespace_name).visit(ast_obj)
 
 
-class CommandNode(ast.Str):
-    pass
-
-
-class Simplifier(ast.NodeVisitor):
-    """
-    Simplifies the whole tree so it would be easier to read later.
-    """
+class MCParser(ast.NodeVisitor):
     def __init__(self, module, namespace_name):
         self._module = module
         self._ns_name = namespace_name
@@ -54,17 +47,22 @@ class Simplifier(ast.NodeVisitor):
     def generic_visit(self, node):
         """Called if no explicit visitor function exists for a node."""
         def helper():
-            for field, value in ast.iter_fields(node):
-                if isinstance(value, list):
-                    for item in value:
-                        if isinstance(item, ast.AST):
-                            ret = self.visit(item)
-                            if ret:
-                                yield ret
-                elif isinstance(value, ast.AST):
-                    ret = self.visit(value)
-                    if ret:
-                        yield ret
+            nonlocal node
+            if isinstance(node, ast.AST):
+                node = [node]
+
+            for n in node:
+                for field, value in ast.iter_fields(n):
+                    if isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, ast.AST):
+                                ret = self.visit(item)
+                                if ret:
+                                    yield ret
+                    elif isinstance(value, ast.AST):
+                        ret = self.visit(value)
+                        if ret:
+                            yield ret
 
         ret_list = list(helper())
         if ret_list:
@@ -96,23 +94,32 @@ class Simplifier(ast.NodeVisitor):
             # Replace function node with function pointer
             return f"function {self._ns_name}:{func.__name__}\n"
 
+        n = len(mc._commands)
         self._eval(node)
-        if mc._commands:
-            return mc._commands.pop()
+        if len(mc._commands) > n:
+            return mc._commands.pop() + '\n'
 
     def visit_Assign(self, node: ast.Assign):
+        n = len(mc._commands)
         self._eval(node)
-        if mc._commands:
-            return mc._commands.pop()
+        if len(mc._commands) > n:
+            return mc._commands.pop() + '\n'
 
     def visit_With(self, node: ast.With):
-        self._eval(node)
-        if mc._commands:
-            return mc._commands.pop()
+        initial = ""
+        for item in node.items:
+            n = len(mc._commands)
+            self._eval(item.context_expr)
+            if len(mc._commands) > n:
+                initial += mc._commands.pop() + ' '
+        initial += "run "
+
+        return '\n'.join(initial + command for command in self.generic_visit(node.body).strip().split('\n')) + '\n'
 
     def visit_Delete(self, node: ast.Delete):
+        n = len(mc._commands)
         self._eval(node)
-        if mc._commands:
-            return mc._commands.pop()
+        if len(mc._commands) > n:
+            return mc._commands.pop() + '\n'
 
 
