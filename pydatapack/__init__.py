@@ -1,2 +1,2 @@
-import pydatapack.compiler
-import pydatapack.mc
+from . import compiler
+from . import mc

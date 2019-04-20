@@ -4,7 +4,7 @@ import typing
 from typeguard import check_argument_types
 
 from pydatapack import utils
-import pydatapack.mc.commands as commands
+from . import commands
 
 __all__ = ["target"]
 
@@ -26,7 +26,7 @@ class _target():
 
 
 class _target_entities(_target):
-    @utils.return_call(_target.__call__)
+    @utils.call_and_return(_target.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
@@ -38,7 +38,7 @@ class _target_entities(_target):
 
 
 class _target_players(_target):
-    @utils.return_call(_target.__call__)
+    @utils.call_and_return(_target.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
@@ -50,7 +50,7 @@ class _target_players(_target):
 
 
 class _target_one(_target):
-    @utils.return_call(_target.__call__)
+    @utils.call_and_return(_target.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,

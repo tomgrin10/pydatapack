@@ -1,11 +1,11 @@
 import enum
+import json
 from typing import *
 
-import json as _json
 from typeguard import check_argument_types
 
 import pydatapack.utils as utils
-from .misc import _target
+import pydatapack.mc.target as target
 
 __all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
 
@@ -18,7 +18,7 @@ class CommandError(Exception):
 
 
 def _to_json(arg) -> str:
-    return _json.dumps(arg)
+    return json.dumps(arg)
 
 
 def _default_parser(arg) -> str:
@@ -98,12 +98,12 @@ class advancement:
 
     @staticmethod
     @_generic_command()
-    def grant(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
+    def grant(target: Union[target._target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert check_argument_types()
 
     @staticmethod
     @_generic_command()
-    def revoke(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
+    def revoke(target: Union[target._target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert check_argument_types()
 
 
@@ -216,7 +216,7 @@ class Bossbar:
 class execute:
     @staticmethod
     @_generic_command()
-    def at(target: Union[_target, str]):
+    def at(target: Union[target._target, str]):
         pass
 
 
@@ -228,14 +228,14 @@ class _gamemode(enum.Enum):
     _value = enum.auto()
 
     @_generic_command(ignore=['self'], name='')
-    def __call__(self, mode: '_gamemode', target: Union[_target, str] = None):
+    def __call__(self, mode: '_gamemode', target: Union[target._target, str] = None):
         assert check_argument_types()
 
 gamemode = _gamemode._value
 
 
 @_generic_command()
-def msg(target: Union[_target, str], msg: str):
+def msg(target: Union[target._target, str], msg: str):
     assert check_argument_types()
 whisper = msg
 tell = msg
