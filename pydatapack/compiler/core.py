@@ -94,32 +94,32 @@ class MCParser(ast.NodeVisitor):
             # Replace function node with function pointer
             return f"function {self._ns_name}:{func.__name__}\n"
 
-        n = len(mc._commands)
+        n = len(mc.internal.commands)
         self._eval(node)
-        if len(mc._commands) > n:
-            return mc._commands.pop() + '\n'
+        if len(mc.internal.commands) > n:
+            return mc.internal.commands.pop() + '\n'
 
     def visit_Assign(self, node: ast.Assign):
-        n = len(mc._commands)
+        n = len(mc.internal.commands)
         self._eval(node)
-        if len(mc._commands) > n:
-            return mc._commands.pop() + '\n'
+        if len(mc.internal.commands) > n:
+            return mc.internal.commands.pop() + '\n'
 
     def visit_With(self, node: ast.With):
         initial = ""
         for item in node.items:
-            n = len(mc._commands)
+            n = len(mc.internal.commands)
             self._eval(item.context_expr)
-            if len(mc._commands) > n:
-                initial += mc._commands.pop() + ' '
+            if len(mc.internal.commands) > n:
+                initial += mc.internal.commands.pop() + ' '
         initial += "run "
 
         return '\n'.join(initial + command for command in self.generic_visit(node.body).strip().split('\n')) + '\n'
 
     def visit_Delete(self, node: ast.Delete):
-        n = len(mc._commands)
+        n = len(mc.internal.commands)
         self._eval(node)
-        if len(mc._commands) > n:
-            return mc._commands.pop() + '\n'
+        if len(mc.internal.commands) > n:
+            return mc.internal.commands.pop() + '\n'
 
 

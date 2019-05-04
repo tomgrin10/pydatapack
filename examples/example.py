@@ -7,6 +7,7 @@ def foo():
     is very cool
     """
     say("Hello, world!")
+    command_unsafe("say Hello, world!")
 
 
 def bar():
@@ -14,6 +15,7 @@ def bar():
     foo()
     say("After!")
     advancement.grant(target.players, advancement.method.only, "minecraft:story/shiny_gear")
+
     bar1 = Bossbar("bar1")
     bar1.add("My bossbar")
     bar1.color = "red"
@@ -23,6 +25,7 @@ def bar():
     bar1.max = 200
     Bossbar.list()
     say(f"name: {bar1.name}, color: {bar1.color}, style: {bar1.style}")
+
     del bar1
     with execute.at(target.entities(sort=target.sort.random, limit=1)):
         summon("minecraft:lightning_bolt")
