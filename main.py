@@ -12,7 +12,7 @@ if __name__ == "__main__":
     while True:
         try:
             pack.dump(
-                Path.home() / r"AppData\Roaming\.minecraft\saves\Superflat Testing\datapacks",
+                Path.home() / r"AppData\Roaming\.minecraft\saves\Flat Testing\datapacks",
                 overwrite=True)
 
             pack.dump(

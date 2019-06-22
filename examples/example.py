@@ -33,9 +33,11 @@ def bar():
 
 
 def a():
-    summon("minecraft:lightning_bolt")
-
-
-def b():
     with execute.at(target.entities(sort=target.sort.random, limit=1)):
+        summon("minecraft:lightning_bolt")
         a()
+
+
+def sleep():
+    with execute.as_(target.players):
+        command_unsafe("execute store result score @s SleepTimer run data get entity @s SleepTimer")

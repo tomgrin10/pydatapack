@@ -1,7 +1,7 @@
 import enum
 from typing import *
 
-from typeguard import check_argument_types
+import typeguard
 
 import pydatapack.mc.target as target
 import pydatapack.mc.internal as internal
@@ -20,12 +20,12 @@ class advancement:
     @staticmethod
     @internal.generic_command()
     def grant(target: Union[target._target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
 
     @staticmethod
     @internal.generic_command()
     def revoke(target: Union[target._target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
 
 
 class Bossbar:
@@ -39,7 +39,7 @@ class Bossbar:
 
     @internal.generic_command(ignore=["self"], name="{__name__} {self.id}", arg_parsers={"name": internal.to_json})
     def add(self, name: str):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
         self._name = name
         self._color = "white"
         self._style = "progress"
@@ -50,11 +50,11 @@ class Bossbar:
 
     @internal.generic_command(ignore=["self"], name="{__name__} {self.id}")
     def _set(self, setting: str, value: Any):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
         setattr(self, f"_{setting}", value)
 
     def _get(self, setting: str):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
         value = getattr(self, f"_{setting}")
         if value:
             return value
@@ -135,7 +135,12 @@ class execute:
     @staticmethod
     @internal.generic_command()
     def at(target: Union[target._target, str]):
-        pass
+        assert typeguard.check_argument_types()
+
+    @staticmethod
+    @internal.generic_command()
+    def as_(target: Union[target._target, str]):
+        assert typeguard.check_argument_types()
 
 
 class _gamemode(enum.Enum):
@@ -147,28 +152,28 @@ class _gamemode(enum.Enum):
 
     @internal.generic_command(ignore=['self'], name='')
     def __call__(self, mode: '_gamemode', target: Union[target._target, str] = None):
-        assert check_argument_types()
+        assert typeguard.check_argument_types()
 
 gamemode = _gamemode._value
 
 
 @internal.generic_command()
 def msg(target: Union[target._target, str], msg: str):
-    assert check_argument_types()
+    assert typeguard.check_argument_types()
 whisper = msg
 tell = msg
 
 
 @internal.generic_command()
 def say(msg: str):
-    assert check_argument_types()
+    assert typeguard.check_argument_types()
 
 
 @internal.generic_command()
 def summon(entity: str):
-    assert check_argument_types()
+    assert typeguard.check_argument_types()
 
 
 @internal.generic_command()
 def tp(*args):
-    assert check_argument_types()
+    assert typeguard.check_argument_types()

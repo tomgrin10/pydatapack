@@ -12,18 +12,18 @@ __all__ = ["target"]
 
 class _target():
     def __init__(self, char: str, kwargs: dict = None):
-        self.char = char
+        self.character = char
 
-        self.kwargs = kwargs or {}
+        self._kwargs = kwargs or {}
 
     def __str__(self):
-        ret = f"@{self.char}"
-        if self.kwargs:
-            ret += f"[{', '.join(f'{name}={pydatapack.mc.internal.default_parser(value)}' for name, value in self.kwargs.items() if value is not None)}]"
+        ret = f"@{self.character}"
+        if self._kwargs:
+            ret += f"[{', '.join(f'{name}={pydatapack.mc.internal.default_parser(value)}' for name, value in self._kwargs.items() if value is not None)}]"
         return ret
 
     def __call__(self, **kwargs):
-        return _target(self.char, kwargs)
+        return _target(self.character, kwargs)
 
 
 class _target_entities(_target):
