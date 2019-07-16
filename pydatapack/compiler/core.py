@@ -5,7 +5,7 @@ from typing import *
 
 import mcpack
 
-import pydatapack.mc.commands as mc
+import pydatapack.mc.basic_commands as mc
 
 
 def parse_module_to_datapack(datapack: mcpack.DataPack, namespace_name: str, module):

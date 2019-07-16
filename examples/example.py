@@ -11,7 +11,7 @@ def foo():
 
 
 def bar():
-    gamemode(target=target.players(limit=1), mode=gamemode.creative)
+    gamemode(target=target.players(limit=2), mode=gamemode.creative)
     foo()
     say("After!")
     advancement.grant(target.players, advancement.method.only, "minecraft:story/shiny_gear")
@@ -24,7 +24,7 @@ def bar():
     bar1.value = 100
     bar1.max = 200
     Bossbar.list()
-    say(f"name: {bar1.name}, color: {bar1.color}, style: {bar1.style}")
+    say(f"name, color, style: {', '.join((bar1.name, bar1.color, bar1.style))}")
 
     del bar1
     with execute.at(target.entities(sort=target.sort.random, limit=1)):

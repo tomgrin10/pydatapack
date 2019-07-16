@@ -5,7 +5,7 @@ from typeguard import check_argument_types
 
 import pydatapack.mc.internal
 from pydatapack import utils
-from . import commands
+from . import basic_commands
 
 __all__ = ["target"]
 
@@ -32,7 +32,7 @@ class _target_entities(_target):
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: 'commands._gamemode' = None, name: str = None,
+                 level: int = None, gamemode: 'basic_commands._gamemode' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
@@ -44,7 +44,7 @@ class _target_players(_target):
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: 'commands._gamemode' = None, name: str = None,
+                 level: int = None, gamemode: 'basic_commands._gamemode' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
         assert check_argument_types()
@@ -55,7 +55,7 @@ class _target_one(_target):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, level: int = None, gamemode: 'commands._gamemode' = None,
+                 team: typing.Union[str, bool] = None, level: int = None, gamemode: 'basic_commands._gamemode' = None,
                  name: str = None, x_rotation: float = None, y_rotation: float = None,
                  type: str = None, advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
