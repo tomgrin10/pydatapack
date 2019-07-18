@@ -26,7 +26,6 @@ def bar():
     Bossbar.list()
     say(f"name, color, style: {', '.join((bar1.name, bar1.color, bar1.style))}")
 
-    del bar1
     with execute.at(target.entities(sort=target.sort.random, limit=1)):
         summon("minecraft:lightning_bolt")
         tp("Mongoriann")

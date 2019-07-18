@@ -1,41 +1,38 @@
-import enum
-import json
 from typing import List, Callable, Any, Dict
 
 from pydatapack import utils as utils
-
+from pydatapack.mc.parsers import default_parser
 
 commands: List[str] = []
 
 
-class CommandError(Exception):
+class DatapackCompilationError(Exception):
+    """
+    Raised when datapack compilation is unsuccessful for any reason.
+    """
     pass
 
 
-def to_json(arg) -> str:
-    return json.dumps(arg)
-
-
-def default_parser(arg) -> str:
-    if isinstance(arg, enum.Enum):
-        return utils.pascal_to_snake_case(arg.name).strip('_').replace('_', '-')
-    if isinstance(arg, bool):
-        return str(arg).lower()
-
-    return str(arg)
+class InvalidCommandError(DatapackCompilationError):
+    """
+    Raised when an invalid command is called.
+    """
+    pass
 
 
 def generic_command(name: str = None,
-                    generic: Callable[[Any], str] = default_parser,
+                    default_parser: Callable[[Any], str] = default_parser,
                     arg_parsers: Dict[str, Callable[[Any], str]] = None,
-                    ignore: List[str] = None):
+                    ignore: List[str] = None,
+                    add_class_name: bool = True):
     """
     Decorator that creates command out of function definition.
     :param name: Name of the command.
-    :param generic: Generic parser to use for parsing arguments instead of default parser
+    :param default_parser: Generic parser to use for parsing arguments instead of default parser
                     The default value is used as the default parser
     :param arg_parsers: Mapping of arguments to their parsers.
     :param ignore: List of arguments to ignore.
+    :param add_class_name: If to add the class name before the command or not.
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -52,9 +49,10 @@ def generic_command(name: str = None,
 
             command = ""
 
-            class_ = utils.get_defining_class(func)
-            if class_:
-                command += utils.pascal_to_snake_case(class_.__name__).strip('_').replace('_', '-') + ' '
+            if add_class_name:
+                class_ = utils.get_defining_class(func)
+                if class_:
+                    command += utils.pascal_to_snake_case(class_.__name__).strip('_').replace('_', '-') + ' '
 
             # Set command name
             final_name = func.__name__.strip('_').replace('_', '-')
@@ -63,7 +61,7 @@ def generic_command(name: str = None,
             if final_name:
                 command += final_name + ' '
 
-            default_arg_parser = utils.get_arg_default(generic_command, "generic")
+            default_arg_parser = utils.get_arg_default(generic_command, "default_parser")
             final_kwargs = {}
             for key, value in unparsed_kwargs.items():
                 # Ignore argument
@@ -71,7 +69,7 @@ def generic_command(name: str = None,
                     continue
 
                 manual_arg_parser = arg_parsers[key] if arg_parsers and arg_parsers.get(key) else lambda x: None
-                final_kwargs[key] = manual_arg_parser(value) or generic(value) or default_arg_parser(value)
+                final_kwargs[key] = manual_arg_parser(value) or default_parser(value) or default_arg_parser(value)
 
             # Set arguments
             command += ' '.join(final_kwargs.values())

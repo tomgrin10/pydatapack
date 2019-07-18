@@ -3,6 +3,7 @@ from typing import *
 
 import typeguard
 
+import pydatapack.mc.parsers as parsers
 import pydatapack.mc.target as target
 import pydatapack.mc.internal as internal
 
@@ -37,7 +38,7 @@ class Bossbar:
     def list():
         pass
 
-    @internal.generic_command(ignore=["self"], name="{__name__} {self.id}", arg_parsers={"name": internal.to_json})
+    @internal.generic_command(ignore=["self"], name="{__name__} {self.id}", arg_parsers={"name": parsers.json_parser})
     def add(self, name: str):
         assert typeguard.check_argument_types()
         self._name = name
@@ -70,7 +71,7 @@ class Bossbar:
         try:
             return self._name
         except AttributeError:
-            raise internal.CommandError("There is no 'bossbar get <id> name' command.")
+            raise internal.InvalidCommandError("There is no 'bossbar get <id> name' command.")
 
     @name.setter
     def name(self, name: str):
@@ -81,7 +82,7 @@ class Bossbar:
         try:
             return self._color
         except AttributeError:
-            raise internal.CommandError("There is no 'bossbar get <id> color' command.")
+            raise internal.InvalidCommandError("There is no 'bossbar get <id> color' command.")
 
     @color.setter
     def color(self, color: str):
@@ -92,7 +93,7 @@ class Bossbar:
         try:
             return self._style
         except AttributeError:
-            raise internal.CommandError("There is no 'bossbar get <id> style' command.")
+            raise internal.InvalidCommandError("There is no 'bossbar get <id> style' command.")
 
     @style.setter
     def style(self, style: str):

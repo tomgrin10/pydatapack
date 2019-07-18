@@ -4,6 +4,7 @@ import typing
 from typeguard import check_argument_types
 
 import pydatapack.mc.internal
+import pydatapack.mc.parsers
 from pydatapack import utils
 from . import basic_commands
 
@@ -19,7 +20,7 @@ class _target():
     def __str__(self):
         ret = f"@{self.character}"
         if self._kwargs:
-            ret += f"[{', '.join(f'{name}={pydatapack.mc.internal.default_parser(value)}' for name, value in self._kwargs.items() if value is not None)}]"
+            ret += f"[{', '.join(f'{name}={pydatapack.mc.parsers.default_parser(value)}' for name, value in self._kwargs.items() if value is not None)}]"
         return ret
 
     def __call__(self, **kwargs):
