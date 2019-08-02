@@ -1,4 +1,4 @@
-import pydatapack.mc.internal as internal
+from pydatapack.mc import internal
 
 
 __all__ = ['command_unsafe']

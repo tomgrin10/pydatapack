@@ -3,15 +3,14 @@ import typing
 
 from typeguard import check_argument_types
 
-import pydatapack.mc.internal
-import pydatapack.mc.parsers
+from pydatapack.mc import internal
 from pydatapack import utils
 from . import basic_commands
 
-__all__ = ["target"]
+__all__ = ["target", "_target"]
 
 
-class _target():
+class _target:
     def __init__(self, char: str, kwargs: dict = None):
         self.character = char
 
@@ -20,7 +19,7 @@ class _target():
     def __str__(self):
         ret = f"@{self.character}"
         if self._kwargs:
-            ret += f"[{', '.join(f'{name}={pydatapack.mc.parsers.default_parser(value)}' for name, value in self._kwargs.items() if value is not None)}]"
+            ret += f"[{', '.join(f'{name}={internal.default_parser(value)}' for name, value in self._kwargs.items() if value is not None)}]"
         return ret
 
     def __call__(self, **kwargs):

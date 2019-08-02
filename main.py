@@ -1,11 +1,12 @@
 from pathlib import Path
 
 import mcpack
+
 import pydatapack.compiler.core as core
 from examples import example
 
 
-if __name__ == "__main__":
+def main():
     pack = mcpack.DataPack("example", "Description")
     core.parse_module_to_datapack(pack, "pack", example)
 
@@ -22,3 +23,7 @@ if __name__ == "__main__":
             break
         except OSError:
             pass
+
+
+if __name__ == "__main__":
+    main()

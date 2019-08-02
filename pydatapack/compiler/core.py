@@ -1,20 +1,19 @@
 import ast
 import inspect
-import types
 from typing import *
 
 import mcpack
 
-import pydatapack.mc.basic_commands as mc
+from ..mc import internal
 
 
 def parse_module_to_datapack(datapack: mcpack.DataPack, namespace_name: str, module):
-    func_tuples = _parse_module(module, namespace_name)
+    func_tuples = _parse_functions_from_module(module, namespace_name)
     for name, func in func_tuples:
         datapack[f"{namespace_name}:{name}"] = func
 
 
-def _parse_module(module, namespace_name: str) -> List[Tuple[str, mcpack.Function]]:
+def _parse_functions_from_module(module, namespace_name: str) -> List[Tuple[str, mcpack.Function]]:
     source = inspect.getsource(module)
     file = inspect.getfile(module)
     compile(source, file, "exec")
@@ -25,12 +24,12 @@ def _parse_module(module, namespace_name: str) -> List[Tuple[str, mcpack.Functio
 class MCParser(ast.NodeVisitor):
     def __init__(self, module, namespace_name):
         self._module = module
-        self._ns_name = namespace_name
+        self._namespace_name = namespace_name
 
         self._globals = self._module.__dict__
         self._locals = {}
 
-    def _eval(self, node):
+    def _eval(self, node: ast.AST):
         try:
             code = compile(ast.Expression(node), inspect.getfile(self._module), "eval")
         except TypeError:
@@ -38,20 +37,28 @@ class MCParser(ast.NodeVisitor):
         else:
             return eval(code, self._globals, self._locals)
 
+    def _eval_and_get_commands(self, node: ast.AST, commands_join_char: str = '\n') -> list:
+        old_commands_count = len(pydatapack.mc.internal.internal.commands)
+        self._eval(node)
+        commands_str = ""
+        for _ in range()
+        if len(pydatapack.mc.internal.internal.commands) > old_commands_count:
+            return pydatapack.mc.internal.internal.commands.pop() + '\n'
+
     def visit_Import(self, node: ast.Import):
         self._eval(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom):
         self._eval(node)
 
-    def generic_visit(self, node):
-        """Called if no explicit visitor function exists for a node."""
+    def generic_visit(self, node: Union[ast.AST, Sequence[ast.AST]]):
+        """
+        Called if no explicit visitor function exists for a node.
+        """
         def helper():
-            nonlocal node
-            if isinstance(node, ast.AST):
-                node = [node]
+            nodes = [node] if isinstance(node, ast.AST) else node
 
-            for n in node:
+            for n in nodes:
                 for field, value in ast.iter_fields(n):
                     if isinstance(value, list):
                         for item in value:
@@ -90,36 +97,37 @@ class MCParser(ast.NodeVisitor):
 
     def visit_Call(self, node: ast.Call):
         func = self._eval(node.func)
+        # If call to another function from module
+        # example: function pack:bar
         if inspect.getmodule(func) == self._module:
-            # Replace function node with function pointer
-            return f"function {self._ns_name}:{func.__name__}\n"
+            return f"function {self._namespace_name}:{func.__name__}\n"
 
-        n = len(mc.internal.commands)
+        n = len(pydatapack.mc.internal.internal.commands)
         self._eval(node)
-        if len(mc.internal.commands) > n:
-            return mc.internal.commands.pop() + '\n'
+        if len(pydatapack.mc.internal.internal.commands) > n:
+            return pydatapack.mc.internal.internal.commands.pop() + '\n'
 
     def visit_Assign(self, node: ast.Assign):
-        n = len(mc.internal.commands)
+        n = len(pydatapack.mc.internal.internal.commands)
         self._eval(node)
-        if len(mc.internal.commands) > n:
-            return mc.internal.commands.pop() + '\n'
+        if len(pydatapack.mc.internal.internal.commands) > n:
+            return pydatapack.mc.internal.internal.commands.pop() + '\n'
 
     def visit_With(self, node: ast.With):
         initial = ""
         for item in node.items:
-            n = len(mc.internal.commands)
+            n = len(pydatapack.mc.internal.internal.commands)
             self._eval(item.context_expr)
-            if len(mc.internal.commands) > n:
-                initial += mc.internal.commands.pop() + ' '
+            if len(pydatapack.mc.internal.internal.commands) > n:
+                initial += pydatapack.mc.internal.internal.commands.pop() + ' '
         initial += "run "
 
         return '\n'.join(initial + command for command in self.generic_visit(node.body).strip().split('\n')) + '\n'
 
     def visit_Delete(self, node: ast.Delete):
-        n = len(mc.internal.commands)
+        n = len(pydatapack.mc.internal.internal.commands)
         self._eval(node)
-        if len(mc.internal.commands) > n:
-            return mc.internal.commands.pop() + '\n'
+        if len(pydatapack.mc.internal.internal.commands) > n:
+            return pydatapack.mc.internal.internal.commands.pop() + '\n'
 
 

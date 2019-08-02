@@ -3,9 +3,8 @@ from typing import *
 
 import typeguard
 
-import pydatapack.mc.parsers as parsers
-import pydatapack.mc.target as target
-import pydatapack.mc.internal as internal
+from pydatapack.mc import target
+from pydatapack.mc import internal
 
 __all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
 
@@ -31,14 +30,14 @@ class advancement:
 
 class Bossbar:
     def __init__(self, id: str):
-        self.id: str = id
+        self.id = id
 
     @staticmethod
     @internal.generic_command()
     def list():
         pass
 
-    @internal.generic_command(ignore=["self"], name="{__name__} {self.id}", arg_parsers={"name": parsers.json_parser})
+    @internal.generic_command(ignore_args=["self"], replace_name="{__name__} {self.id}", arg_parsers={"name": parsers.json_parser})
     def add(self, name: str):
         assert typeguard.check_argument_types()
         self._name = name
@@ -49,7 +48,7 @@ class Bossbar:
         self._visible = True
         self._players = None
 
-    @internal.generic_command(ignore=["self"], name="{__name__} {self.id}")
+    @internal.generic_command(ignore_args=["self"], replace_name="{__name__} {self.id}")
     def _set(self, setting: str, value: Any):
         assert typeguard.check_argument_types()
         setattr(self, f"_{setting}", value)
@@ -62,7 +61,7 @@ class Bossbar:
         else:
             internal.commands.append(f"bossbar get {self.id} {setting}")
 
-    @internal.generic_command(ignore=["self"], name="remove {self.id}")
+    @internal.generic_command(ignore_args=["self"], replace_name="remove {self.id}")
     def remove(self):
         pass
 
@@ -151,7 +150,7 @@ class _gamemode(enum.Enum):
     spectator = enum.auto()
     _value = enum.auto()
 
-    @internal.generic_command(ignore=['self'], name='')
+    @internal.generic_command(ignore_args=['self'], replace_name='')
     def __call__(self, mode: '_gamemode', target: Union[target._target, str] = None):
         assert typeguard.check_argument_types()
 

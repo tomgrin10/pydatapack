@@ -3,6 +3,8 @@ import json
 
 from pydatapack import utils as utils
 
+__all__ = ['json_parser', 'default_parser']
+
 
 def json_parser(arg) -> str:
     return json.dumps(arg)

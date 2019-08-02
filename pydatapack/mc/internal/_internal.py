@@ -1,41 +1,38 @@
-from typing import List, Callable, Any, Dict
+from typing import List, Callable, Any, Dict, Optional
 
 from pydatapack import utils as utils
-from pydatapack.mc.parsers import default_parser
+from pydatapack.mc.internal._parsers import default_parser
+
+__all__ = ['commands', 'generic_command']
 
 commands: List[str] = []
 
 
-class DatapackCompilationError(Exception):
-    """
-    Raised when datapack compilation is unsuccessful for any reason.
-    """
-    pass
+DEFAULT_IGNORE_ARGS = ['self']
 
 
-class InvalidCommandError(DatapackCompilationError):
-    """
-    Raised when an invalid command is called.
-    """
-    pass
-
-
-def generic_command(name: str = None,
+def generic_command(replace_name: Optional[str] = None,
                     default_parser: Callable[[Any], str] = default_parser,
-                    arg_parsers: Dict[str, Callable[[Any], str]] = None,
-                    ignore: List[str] = None,
+                    arg_parsers: Optional[Dict[str, Callable[[Any], str]]] = None,
+                    ignore_args: Optional[List[str]] = None,
                     add_class_name: bool = True):
     """
     Decorator that creates command out of function definition.
-    :param name: Name of the command.
-    :param default_parser: Generic parser to use for parsing arguments instead of default parser
-                    The default value is used as the default parser
+    :param replace_name: String to replace name of the command, function arguments are injected into it via format().
+    :param default_parser: Generic parser to use for parsing arguments instead of default parser.
+                           The default value is used as the default parser.
     :param arg_parsers: Mapping of arguments to their parsers.
-    :param ignore: List of arguments to ignore.
+    :param ignore_args: List of arguments to ignore.
     :param add_class_name: If to add the class name before the command or not.
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
+            return_value = func(*args, **kwargs)
+
+            # Resolve parameters
+            nonlocal ignore_args
+            ignore_args = (ignore_args or []) + DEFAULT_IGNORE_ARGS
+
             unparsed_kwargs = {}
             if args or kwargs:
                 arg_names = func.__code__.co_varnames
@@ -56,8 +53,8 @@ def generic_command(name: str = None,
 
             # Set command name
             final_name = func.__name__.strip('_').replace('_', '-')
-            if name is not None:
-                final_name = name.format(__name__=final_name, **unparsed_kwargs)
+            if replace_name is not None:
+                final_name = replace_name.format(__name__=final_name, **unparsed_kwargs)
             if final_name:
                 command += final_name + ' '
 
@@ -65,7 +62,7 @@ def generic_command(name: str = None,
             final_kwargs = {}
             for key, value in unparsed_kwargs.items():
                 # Ignore argument
-                if ignore and key in ignore:
+                if ignore_args and key in ignore_args:
                     continue
 
                 manual_arg_parser = arg_parsers[key] if arg_parsers and arg_parsers.get(key) else lambda x: None
@@ -75,7 +72,16 @@ def generic_command(name: str = None,
             command += ' '.join(final_kwargs.values())
 
             commands.append(command.strip())
-            return func(*args, **kwargs)
+            return return_value
 
         return wrapper
+    return decorator
+
+
+def class_options(replace_name: Optional[str] = None):
+    def decorator(orig_class):
+        if replace_name:
+            orig_class.__name__ = replace_name
+
+        return orig_class
     return decorator
