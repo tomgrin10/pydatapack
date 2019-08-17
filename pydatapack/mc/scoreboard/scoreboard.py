@@ -2,8 +2,8 @@ from typing import Optional, Union
 
 import typeguard
 
-from pydatapack.mc import target
-from pydatapack.mc import internal
+from .. import _target
+from .. import internal
 
 __all__ = ['Objective', 'Score']
 
@@ -41,7 +41,7 @@ class Score:
     MAX_VALUE = 2_147_483_647
     MIN_VALUE = -2_147_483_648
 
-    def __init__(self, entity: Union[target, str], objective: Union[str, Objective]):
+    def __init__(self, entity: Union[_target, str], objective: Union[str, Objective]):
         assert typeguard.check_argument_types()
 
         self.entity = entity
@@ -85,5 +85,5 @@ class Score:
     @staticmethod
     @internal.generic_command(add_class_name=False,
                                replace_name="scoreboard players list")
-    def list_scores(entity: Union[target, str]):
+    def list_scores(entity: Union[_target, str]):
         assert typeguard.check_argument_types()

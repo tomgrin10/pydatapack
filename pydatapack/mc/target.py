@@ -3,9 +3,12 @@ import typing
 
 from typeguard import check_argument_types
 
-from pydatapack.mc import internal
-from pydatapack import utils
-from . import basic_commands
+from . import internal
+from .. import utils
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from . import basic_commands
 
 __all__ = ["target", "_target"]
 
