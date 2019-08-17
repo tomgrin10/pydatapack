@@ -1,4 +1,5 @@
 import collections
+import functools
 import inspect
 import re
 from typing import *
@@ -81,6 +82,7 @@ def call_and_return(function_to_call):
     Decorator that calls a function and returns its return value.
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
             return function_to_call(*args, **kwargs)

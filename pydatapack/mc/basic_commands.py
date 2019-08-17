@@ -3,10 +3,10 @@ from typing import *
 
 import typeguard
 
-from . import _target
 from . import internal
+from . import TargetType
 
-__all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
+__all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'GamemodeType', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
 
 
 class advancement:
@@ -19,12 +19,12 @@ class advancement:
 
     @staticmethod
     @internal.generic_command()
-    def grant(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
+    def grant(target: Union[TargetType, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert typeguard.check_argument_types()
 
     @staticmethod
     @internal.generic_command()
-    def revoke(target: Union[_target, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
+    def revoke(target: Union[TargetType, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
         assert typeguard.check_argument_types()
 
 
@@ -134,16 +134,16 @@ class Bossbar:
 class execute:
     @staticmethod
     @internal.generic_command()
-    def at(target: Union[_target, str]):
+    def at(target: Union[TargetType, str]):
         assert typeguard.check_argument_types()
 
     @staticmethod
     @internal.generic_command()
-    def as_(target: Union[_target, str]):
+    def as_(target: Union[TargetType, str]):
         assert typeguard.check_argument_types()
 
 
-class _gamemode(enum.Enum):
+class GamemodeType(enum.Enum):
     survival = enum.auto()
     creative = enum.auto()
     adventure = enum.auto()
@@ -151,14 +151,15 @@ class _gamemode(enum.Enum):
     _value = enum.auto()
 
     @internal.generic_command(ignore_args=['self'], replace_name='')
-    def __call__(self, mode: '_gamemode', target: Union[_target, str] = None):
-        assert typeguard.check_argument_types()
+    @typeguard.typechecked(always=True)
+    def __call__(self, mode: 'GamemodeType', target: Union[TargetType, str] = None):
+        pass
 
-gamemode = _gamemode._value
+gamemode = GamemodeType._value
 
 
 @internal.generic_command()
-def msg(target: Union[_target, str], msg: str):
+def msg(target: Union[TargetType, str], msg: str):
     assert typeguard.check_argument_types()
 whisper = msg
 tell = msg

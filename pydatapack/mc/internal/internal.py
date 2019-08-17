@@ -1,7 +1,7 @@
 import functools
 from typing import List, Callable, Any, Dict, Optional
 
-from ... import utils as utils
+from pydatapack import utils as utils
 from .parsers import default_parser
 
 __all__ = ['commands', 'generic_command', 'class_options']

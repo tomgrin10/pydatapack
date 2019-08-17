@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 import typeguard
 
-from .. import _target
+from pydatapack.mc import TargetType
 from .. import internal
 
 __all__ = ['Objective', 'Score']
@@ -18,7 +18,7 @@ class Objective:
         assert typeguard.check_argument_types()
 
     @internal.generic_command(replace_name="{__name__} {self.name}",
-                               arg_parsers={"display_name": internal.json_parser})
+                              arg_parsers={"display_name": internal.json_parser})
     def remove(self, name: str, criteria: str, display_name: Optional[str] = None):
         assert typeguard.check_argument_types()
 
@@ -41,7 +41,7 @@ class Score:
     MAX_VALUE = 2_147_483_647
     MIN_VALUE = -2_147_483_648
 
-    def __init__(self, entity: Union[_target, str], objective: Union[str, Objective]):
+    def __init__(self, entity: Union[TargetType, str], objective: Union[str, Objective]):
         assert typeguard.check_argument_types()
 
         self.entity = entity
@@ -52,15 +52,16 @@ class Score:
         assert typeguard.check_argument_types()
         if not (self.MIN_VALUE <= score <= self.MAX_VALUE):
             raise internal.BadArgumentsError(f"amount needs to be between between {self.MIN_VALUE:n} and {self.MAX_VALUE:n},"
-                                    f" inclusive.\n"
-                                    f"Received: {score}")
+                                             f" inclusive.\n"
+                                             f"Received: {score}")
 
     @internal.generic_command(replace_name="{__name__} {self.entity} {self.objective}")
     def add(self, amount: int):
         assert typeguard.check_argument_types()
         if not (0 <= amount <= self.MAX_VALUE):
             raise internal.BadArgumentsError(f"amount needs to be between between 0 and {self.MAX_VALUE:n}, inclusive.\n"
-                                    f"Received: {amount}")
+                                             f"Received: {amount}")
+
     __iadd__ = add
 
     @internal.generic_command(replace_name="{__name__} {self.entity} {self.objective}")
@@ -68,7 +69,8 @@ class Score:
         assert typeguard.check_argument_types()
         if not (0 <= amount <= self.MAX_VALUE):
             raise internal.BadArgumentsError(f"amount needs to be between between 0 and {self.MAX_VALUE:n}, inclusive.\n"
-                                    f"Received: {amount}")
+                                             f"Received: {amount}")
+
     subtract = remove
     __isub__ = remove
 
@@ -78,12 +80,12 @@ class Score:
 
     @staticmethod
     @internal.generic_command(add_class_name=False,
-                               replace_name="scoreboard players list")
+                              replace_name="scoreboard players list")
     def list_tracked_entities():
         assert typeguard.check_argument_types()
 
     @staticmethod
     @internal.generic_command(add_class_name=False,
-                               replace_name="scoreboard players list")
-    def list_scores(entity: Union[_target, str]):
+                              replace_name="scoreboard players list")
+    def list_scores(entity: Union[TargetType, str]):
         assert typeguard.check_argument_types()

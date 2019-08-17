@@ -3,17 +3,14 @@ import typing
 
 from typeguard import check_argument_types
 
+from . import basic_commands
 from . import internal
-from .. import utils
+from pydatapack import utils
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from . import basic_commands
-
-__all__ = ["target", "_target"]
+__all__ = ["target", "TargetType"]
 
 
-class _target:
+class TargetType:
     def __init__(self, char: str, kwargs: dict = None):
         self.character = char
 
@@ -26,39 +23,39 @@ class _target:
         return ret
 
     def __call__(self, **kwargs):
-        return _target(self.character, kwargs)
+        return TargetType(self.character, kwargs)
 
 
-class _target_entities(_target):
-    @utils.call_and_return(_target.__call__)
+class _TargetEntitiesType(TargetType):
+    @utils.call_and_return(TargetType.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: 'basic_commands._gamemode' = None, name: str = None,
+                 level: int = None, gamemode: 'basic_commands.GamemodeType' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
 
 
-class _target_players(_target):
-    @utils.call_and_return(_target.__call__)
+class _TargetPlayersType(TargetType):
+    @utils.call_and_return(TargetType.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: 'basic_commands._gamemode' = None, name: str = None,
+                 level: int = None, gamemode: 'basic_commands.GamemodeType' = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
         assert check_argument_types()
 
 
-class _target_one(_target):
-    @utils.call_and_return(_target.__call__)
+class _TargetSingleType(TargetType):
+    @utils.call_and_return(TargetType.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, level: int = None, gamemode: 'basic_commands._gamemode' = None,
+                 team: typing.Union[str, bool] = None, level: int = None, gamemode: 'basic_commands.GamemodeType' = None,
                  name: str = None, x_rotation: float = None, y_rotation: float = None,
                  type: str = None, advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
@@ -71,9 +68,9 @@ class target:
         furthest = enum.auto()
         random = enum.auto()
 
-    players = _target_players('a')
-    entities = _target_entities('e')
-    random = _target_players('r')
-    near = _target_players('p')
-    me = _target_one('s')
+    players = _TargetPlayersType('a')
+    entities = _TargetEntitiesType('e')
+    random = _TargetPlayersType('r')
+    near = _TargetPlayersType('p')
+    me = _TargetSingleType('s')
 
