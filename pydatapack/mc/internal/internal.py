@@ -1,9 +1,9 @@
 from typing import List, Callable, Any, Dict, Optional
 
-from pydatapack import utils as utils
-from pydatapack.mc.internal._parsers import default_parser
+from ... import utils as utils
+from .parsers import default_parser
 
-__all__ = ['commands', 'generic_command']
+__all__ = ['commands', 'generic_command', 'class_options']
 
 commands: List[str] = []
 
