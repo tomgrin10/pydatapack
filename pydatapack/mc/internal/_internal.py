@@ -1,3 +1,4 @@
+import functools
 from typing import List, Callable, Any, Dict, Optional
 
 from pydatapack import utils as utils
@@ -26,6 +27,7 @@ def generic_command(replace_name: Optional[str] = None,
     :param add_class_name: If to add the class name before the command or not.
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             return_value = func(*args, **kwargs)
 
