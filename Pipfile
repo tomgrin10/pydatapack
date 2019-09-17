@@ -6,11 +6,9 @@ name = "pypi"
 [packages]
 mcpack = "==0.3.8"
 typeguard = "==2.3.1"
-typed-ast = "==1.4.0"
-nbtlib = "==1.4.8"
-numpy = "==1.16.4"
 
 [dev-packages]
+ipython = "*"
 
 [requires]
 python_version = "3.7"

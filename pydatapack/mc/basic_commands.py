@@ -6,7 +6,7 @@ import typeguard
 from . import internal
 from . import TargetType
 
-__all__ = ['advancement', 'Bossbar', 'execute', 'gamemode', 'GamemodeType', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
+__all__ = ['advancement', 'Bossbar', 'execute', 'msg', 'whisper', 'tell', 'say', 'summon', 'tp']
 
 
 class advancement:
@@ -141,21 +141,6 @@ class execute:
     @internal.generic_command()
     def as_(target: Union[TargetType, str]):
         assert typeguard.check_argument_types()
-
-
-class GamemodeType(enum.Enum):
-    survival = enum.auto()
-    creative = enum.auto()
-    adventure = enum.auto()
-    spectator = enum.auto()
-    _value = enum.auto()
-
-    @internal.generic_command(ignore_args=['self'], replace_name='')
-    @typeguard.typechecked(always=True)
-    def __call__(self, mode: 'GamemodeType', target: Union[TargetType, str] = None):
-        pass
-
-gamemode = GamemodeType._value
 
 
 @internal.generic_command()
