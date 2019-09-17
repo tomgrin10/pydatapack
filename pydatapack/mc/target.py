@@ -6,7 +6,7 @@ import typing
 from typeguard import check_argument_types
 
 from pydatapack import utils
-from . import GamemodeEnum
+from . import GamemodeType
 from . import internal
 
 __all__ = ["target", "TargetType"]
@@ -34,7 +34,7 @@ class _TargetEntitiesType(TargetType):
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: GamemodeEnum = None, name: str = None,
+                 level: int = None, gamemode: GamemodeType = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
@@ -46,7 +46,7 @@ class _TargetPlayersType(TargetType):
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
                  team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: GamemodeEnum = None, name: str = None,
+                 level: int = None, gamemode: GamemodeType = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
         assert check_argument_types()
@@ -57,7 +57,7 @@ class _TargetSingleType(TargetType):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, level: int = None, gamemode: GamemodeEnum = None,
+                 team: typing.Union[str, bool] = None, level: int = None, gamemode: GamemodeType = None,
                  name: str = None, x_rotation: float = None, y_rotation: float = None,
                  type: str = None, advancements: dict = None, nbt: dict = None):
         assert check_argument_types()

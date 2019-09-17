@@ -2,7 +2,7 @@ from pathlib import Path
 
 import mcpack
 
-import pydatapack.compiler.core as core
+from pydatapack.compiler import core
 from examples import example
 
 

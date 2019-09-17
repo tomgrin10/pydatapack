@@ -1,11 +1,10 @@
 import ast
 import inspect
-import itertools
 from typing import *
 
 import mcpack
 
-from ..mc import internal
+from pydatapack import mc
 
 
 def parse_module_to_datapack(datapack: mcpack.DataPack, namespace_name: str, module):
@@ -45,10 +44,10 @@ class MCParser(ast.NodeVisitor):
         :param commands_join_str: String to place between commands.
         :return: A string containing a concatenation of gotten commands.
         """
-        old_commands_count = len(internal.commands)
+        old_commands_count = len(mc.internal.commands)
         self._eval(node)
-        commands_str = commands_join_str.join(internal.commands[old_commands_count:])
-        internal.commands = internal.commands[:old_commands_count]
+        commands_str = commands_join_str.join(mc.internal.commands[old_commands_count:])
+        mc.internal.commands = mc.internal.commands[:old_commands_count]
 
         return commands_str
 

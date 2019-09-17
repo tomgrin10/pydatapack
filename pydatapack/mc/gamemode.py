@@ -3,12 +3,12 @@ from typing import Union
 
 import typeguard
 
-from pydatapack.mc import internal, _target
+from pydatapack.mc import internal, TargetType
 
-__all__ = ['gamemode', 'GamemodeEnum']
+__all__ = ['gamemode', 'GamemodeType']
 
 
-class GamemodeEnum(enum.Enum):
+class GamemodeType(enum.Enum):
     survival = enum.auto()
     creative = enum.auto()
     adventure = enum.auto()
@@ -16,8 +16,8 @@ class GamemodeEnum(enum.Enum):
     _value = enum.auto()
 
     @internal.generic_command(ignore_args=['self'], replace_name='')
-    def __call__(self, mode: 'GamemodeEnum', target: Union[_target, str] = None):
+    def __call__(self, mode: 'GamemodeType', target: Union[TargetType, str] = None):
         assert typeguard.check_argument_types()
 
 
-gamemode = GamemodeEnum._value
+gamemode = GamemodeType._value
