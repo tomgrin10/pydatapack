@@ -1,7 +1,7 @@
 import enum
 from typing import *
 
-import typeguard
+from typeguard import check_argument_types
 
 from . import internal
 from . import TargetType
@@ -20,12 +20,12 @@ class advancement:
     @staticmethod
     @internal.generic_command()
     def grant(target: Union[TargetType, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
 
     @staticmethod
     @internal.generic_command()
     def revoke(target: Union[TargetType, str], method: method, advancement: Optional[str] = None, criterion: Optional[str] = None):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
 
 
 class Bossbar:
@@ -39,7 +39,7 @@ class Bossbar:
 
     @internal.generic_command(ignore_args=["self"], replace_name="{__name__} {self.id}", arg_parsers={"name": internal.json_parser})
     def add(self, name: str):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
         self._name = name
         self._color = "white"
         self._style = "progress"
@@ -50,11 +50,11 @@ class Bossbar:
 
     @internal.generic_command(ignore_args=["self"], replace_name="{__name__} {self.id}")
     def _set(self, setting: str, value: Any):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
         setattr(self, f"_{setting}", value)
 
     def _get(self, setting: str):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
         value = getattr(self, f"_{setting}")
         if value:
             return value
@@ -135,31 +135,31 @@ class execute:
     @staticmethod
     @internal.generic_command()
     def at(target: Union[TargetType, str]):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
 
     @staticmethod
     @internal.generic_command()
     def as_(target: Union[TargetType, str]):
-        assert typeguard.check_argument_types()
+        assert check_argument_types()
 
 
 @internal.generic_command()
 def msg(target: Union[TargetType, str], msg: str):
-    assert typeguard.check_argument_types()
+    assert check_argument_types()
 whisper = msg
 tell = msg
 
 
 @internal.generic_command()
 def say(msg: str):
-    assert typeguard.check_argument_types()
+    assert check_argument_types()
 
 
 @internal.generic_command()
 def summon(entity: str):
-    assert typeguard.check_argument_types()
+    assert check_argument_types()
 
 
 @internal.generic_command()
 def tp(*args):
-    assert typeguard.check_argument_types()
+    assert check_argument_types()

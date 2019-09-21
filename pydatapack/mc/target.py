@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import enum
-import typing
+from typing import Union, Any, Optional
 
-from typeguard import check_argument_types
+from typeguard import check_argument_types, typechecked, check_type
 
 from pydatapack import utils
-from . import GamemodeType
 from . import internal
 
 __all__ = ["target", "TargetType"]
@@ -29,15 +28,19 @@ class TargetType:
 
 
 class _TargetEntitiesType(TargetType):
+    @ty
     @utils.call_and_return(TargetType.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: GamemodeType = None, name: str = None,
+                 team: Union[str, bool] = None, limit: int = None, sort: target.sort = None,
+                 level: int = None, gamemode: Any = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
+        # Check gamemode this way to ignore a circular import
+        from . import GamemodeType
+        check_type("gamemode", gamemode, Optional[GamemodeType])
 
 
 class _TargetPlayersType(TargetType):
@@ -45,11 +48,14 @@ class _TargetPlayersType(TargetType):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, limit: int = None, sort: 'target.sort' = None,
-                 level: int = None, gamemode: GamemodeType = None, name: str = None,
+                 team: Union[str, bool] = None, limit: int = None, sort: target.sort = None,
+                 level: int = None, gamemode: Any = None, name: str = None,
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
         assert check_argument_types()
+        # Check gamemode this way to ignore a circular import
+        from . import GamemodeType
+        check_type("gamemode", gamemode, Optional[GamemodeType])
 
 
 class _TargetSingleType(TargetType):
@@ -57,10 +63,13 @@ class _TargetSingleType(TargetType):
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
                  dz: float = None, scores: dict = None, tag: str = None,
-                 team: typing.Union[str, bool] = None, level: int = None, gamemode: GamemodeType = None,
+                 team: Union[str, bool] = None, level: int = None, gamemode: Any = None,
                  name: str = None, x_rotation: float = None, y_rotation: float = None,
                  type: str = None, advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
+        # Check gamemode this way to ignore a circular import
+        from . import GamemodeType
+        check_type("gamemode", gamemode, Optional[GamemodeType])
 
 
 class target:
