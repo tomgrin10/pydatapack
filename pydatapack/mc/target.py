@@ -28,7 +28,6 @@ class TargetType:
 
 
 class _TargetEntitiesType(TargetType):
-    @ty
     @utils.call_and_return(TargetType.__call__)
     def __call__(self, *, x: float = None, y: float = None, z: float = None,
                  distance: float = None, dx: float = None, dy: float = None,
@@ -38,7 +37,7 @@ class _TargetEntitiesType(TargetType):
                  x_rotation: float = None, y_rotation: float = None, type: str = None,
                  advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
-        # Check gamemode this way to ignore a circular import
+        # Check gamemode this way to avoid a circular import
         from . import GamemodeType
         check_type("gamemode", gamemode, Optional[GamemodeType])
 
@@ -53,7 +52,7 @@ class _TargetPlayersType(TargetType):
                  x_rotation: float = None, y_rotation: float = None, advancements: dict = None,
                  nbt: dict = None):
         assert check_argument_types()
-        # Check gamemode this way to ignore a circular import
+        # Check gamemode this way to avoid a circular import
         from . import GamemodeType
         check_type("gamemode", gamemode, Optional[GamemodeType])
 
@@ -67,7 +66,7 @@ class _TargetSingleType(TargetType):
                  name: str = None, x_rotation: float = None, y_rotation: float = None,
                  type: str = None, advancements: dict = None, nbt: dict = None):
         assert check_argument_types()
-        # Check gamemode this way to ignore a circular import
+        # Check gamemode this way to avoid a circular import
         from . import GamemodeType
         check_type("gamemode", gamemode, Optional[GamemodeType])
 
